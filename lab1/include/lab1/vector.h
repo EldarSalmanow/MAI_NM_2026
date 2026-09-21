@@ -2,6 +2,7 @@
 #define MAI_NM_2026_VECTOR_H
 
 #include <cmath>
+#include <complex>
 #include <iomanip>
 #include <vector>
 
@@ -197,7 +198,7 @@ public:
         for (size_type i = 0; i < vector.Size(); ++i) {
             stream
                 << std::setw(10) << std::fixed << std::setprecision(4)
-                << static_cast<double>(vector[i])
+                << vector[i]
                 << std::endl;
         }
 
@@ -222,6 +223,8 @@ private:
 };
 
 using VectorF64 = BaseVector<double>;
+
+using VectorCF64 = BaseVector<std::complex<double>>;
 
 using Vector = VectorF64;
 
