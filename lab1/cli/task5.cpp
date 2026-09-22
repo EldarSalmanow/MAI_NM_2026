@@ -18,56 +18,30 @@ auto QRFactorization(
 
     for (size_type j = 0; j < n - 1; ++j) {
         Vector v(n, 0.0);
-
-        double norm_x = 0.0;
-        for (size_type i = j; i < n; ++i) {
-            norm_x += R[i][j] * R[i][j];
-        }
-        norm_x = std::sqrt(norm_x);
-
-        if (norm_x < epsilon) {
-            continue;
-        }
-
         for (size_type i = j; i < n; ++i) {
             v[i] = R[i][j];
         }
 
-        const double sign = (v[j] >= 0.0) ? 1.0 : -1.0;
-        v[j] += sign * norm_x;
+        const auto sign = (v[j] >= 0.0) ? 1.0 : -1.0;
+        v[j] += sign * v.Norm();
 
-        double v_norm_sq = 0.0;
-        for (size_type i = j; i < n; ++i) {
-            v_norm_sq += v[i] * v[i];
-        }
+        const auto v_norm_square = v.Dot(v);
 
-        if (v_norm_sq < epsilon) {
+        if (v_norm_square < epsilon) {
             continue;
         }
 
-        for (size_type c = j; c < n; ++c) {
-            double dot = 0.0;
-            for (size_type r = j; r < n; ++r) {
-                dot += v[r] * R[r][c];
-            }
+        Matrix H = Matrix::Identity(n);
+        Matrix vvT = Matrix::OuterProduct(v, v);
 
-            const double scale = 2.0 * dot / v_norm_sq;
-            for (size_type r = j; r < n; ++r) {
-                R[r][c] -= scale * v[r];
+        for (size_type i = 0; i < n; ++i) {
+            for (size_type k = 0; k < n; ++k) {
+                H[i][k] -= 2.0 * vvT[i][k] / v_norm_square;
             }
         }
 
-        for (size_type r = 0; r < n; ++r) {
-            double dot = 0.0;
-            for (size_type c = j; c < n; ++c) {
-                dot += Q[r][c] * v[c];
-            }
-
-            const double scale = 2.0 * dot / v_norm_sq;
-            for (size_type c = j; c < n; ++c) {
-                Q[r][c] -= scale * v[c];
-            }
-        }
+        R = H * R;
+        Q = Q * H;
     }
 
     return {Q, R};
@@ -85,7 +59,7 @@ auto ExtractEigenValues(
 
     for (size_type i = 0; i < n; ++i) {
         if (i < n - 1 && std::abs(A[i + 1][i]) > epsilon) {
-            const double a = A[i][i], b = A[i][i+1], c = A[i+1][i], d = A[i+1][i+1];
+            const double a = A[i][i], b = A[i][i + 1], c = A[i + 1][i], d = A[i + 1][i + 1];
 
             const double trace = a + d;
             const double det = a * d - b * c;

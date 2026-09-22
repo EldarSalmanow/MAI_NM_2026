@@ -59,6 +59,18 @@ public:
         return Diagonal(n, value_type { 1 });
     }
 
+    static auto OuterProduct(const BaseVector<value_type> &vector_1, const BaseVector<value_type> &vector_2) -> BaseMatrix {
+        auto result = BaseMatrix::Zero(vector_1.Size(), vector_2.Size());
+
+        for (size_type i = 0; i < vector_1.Size(); ++i) {
+            for (size_type j = 0; j < vector_2.Size(); ++j) {
+                result[i][j] = vector_1[i] * vector_2[j];
+            }
+        }
+
+        return result;
+    }
+
 public:
     auto SwapRows(size_type row_1, size_type row_2) -> void {
         std::swap(data_[row_1], data_[row_2]);
