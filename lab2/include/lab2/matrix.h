@@ -1,7 +1,7 @@
 #ifndef MAI_NM_2026_MATRIX_H
 #define MAI_NM_2026_MATRIX_H
 
-#include <lab1/vector.h>
+#include <lab2/vector.h>
 
 
 template<typename T>
