@@ -184,47 +184,52 @@ int main(int argc, char **argv) {
         std::numbers::pi / 4.0,
         std::numbers::pi / 2.0
     };
+    // const auto X = std::numbers::pi / 4.0;
     const auto X = 1.0;
 
-    auto x_nodes = newtonXs;
+    for (auto &nodes : {lagrangeXs, newtonXs}) {
+        auto x_nodes = nodes;
 
-    std::array<double, 4> y_nodes {};
-    for (std::uint64_t i = 0; i < x_nodes.size(); ++i) {
-        y_nodes[i] = function(x_nodes[i]);
-    }
-
-    std::cout << "1. Nodes\n\n";
-    for (std::size_t i = 0; i < x_nodes.size(); ++i) {
-        std::cout << "x[" << i << "] = " << std::setw(8) << x_nodes[i] << ", y[" << i << "] = " << std::setw(8) << y_nodes[i] << "\n";
-    }
-
-    std::cout << "\n2. Lagrange Polynom: " << LagrangePolynomialString(x_nodes, y_nodes) << "\n";
-
-    auto differences = DividedDifferences(x_nodes, y_nodes);
-
-    std::cout << "\n3. Divided Differences Table\n";
-    for (std::uint64_t i = 0; i < differences.size(); ++i) {
-        std::cout << "   f(";
-
-        for (std::uint64_t j = 0; j <= i; ++j) {
-            std::cout << (j == 0 ? "" : ", ") << "x" << j;
+        std::array<double, 4> y_nodes {};
+        for (std::uint64_t i = 0; i < x_nodes.size(); ++i) {
+            y_nodes[i] = function(x_nodes[i]);
         }
 
-        std::cout << ") = " << differences[i] << "\n";
+        std::cout << "1. Nodes\n\n";
+        for (std::size_t i = 0; i < x_nodes.size(); ++i) {
+            std::cout << "x[" << i << "] = " << std::setw(8) << x_nodes[i] << ", y[" << i << "] = " << std::setw(8) << y_nodes[i] << "\n";
+        }
+
+        std::cout << "\n2. Lagrange Polynom: " << LagrangePolynomialString(x_nodes, y_nodes) << "\n";
+
+        auto differences = DividedDifferences(x_nodes, y_nodes);
+
+        std::cout << "\n3. Divided Differences Table\n";
+        for (std::uint64_t i = 0; i < differences.size(); ++i) {
+            std::cout << "   f(";
+
+            for (std::uint64_t j = 0; j <= i; ++j) {
+                std::cout << (j == 0 ? "" : ", ") << "x" << j;
+            }
+
+            std::cout << ") = " << differences[i] << "\n";
+        }
+
+        std::cout << "\n4. Newton Polynom: " << NewtonPolynomialString(x_nodes, differences) << "\n";
+
+        const auto lagrange = LagrangeEvaluate(x_nodes, y_nodes, X);
+        const auto newton = NewtonEvaluate(x_nodes, y_nodes, differences, X);
+        const auto y = function(X);
+
+        std::cout << "\n5. L(X) = " << lagrange << "\n";
+        std::cout << "\n6. N(X) = " << newton << "\n";
+        std::cout << "\n7. f(X) = " << y << "\n";
+        std::cout << "\n8. Absolute Error L(X): " << std::abs(y - lagrange) <<
+                     "\n   Absolute Error N(X): " << std::abs(y - newton) << "\n";
+        std::cout << "\n9. Difference |L(X) - N(X)| = " << std::abs(lagrange - newton) << "\n";
+
+        std::cout << "\n\n";
     }
-
-    std::cout << "\n4. Newton Polynom: " << NewtonPolynomialString(x_nodes, differences) << "\n";
-
-    const auto lagrange = LagrangeEvaluate(x_nodes, y_nodes, X);
-    const auto newton = NewtonEvaluate(x_nodes, y_nodes, differences, X);
-    const auto y = function(X);
-
-    std::cout << "\n5. L(X) = " << lagrange << "\n";
-    std::cout << "\n6. N(X) = " << newton << "\n";
-    std::cout << "\n7. f(X) = " << y << "\n";
-    std::cout << "\n8. Absolute Error L(X): " << std::abs(y - lagrange) <<
-                 "\n   Absolute Error N(X): " << std::abs(y - newton) << "\n";
-    std::cout << "\n9. Difference |L(X) - N(X)| = " << std::abs(lagrange - newton) << "\n";
 
     return 0;
 }
